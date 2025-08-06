@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import { ThemeEnum } from "../model/enums/theme";
+import { Preferences } from "@capacitor/preferences";
 
 @Injectable({
     providedIn: "root",
@@ -15,7 +16,7 @@ export class ThemeService {
         }
     }
 
-    applyTheme(theme: ThemeEnum) {
+    async applyTheme(theme: ThemeEnum) {
         if (theme == ThemeEnum.DARK) {
             document.body.classList.remove(ThemeEnum.LIGHT);
             document.body.classList.add(ThemeEnum.DARK);
@@ -23,12 +24,15 @@ export class ThemeService {
             document.body.classList.remove(ThemeEnum.DARK);
             document.body.classList.add(ThemeEnum.LIGHT);
         }
-        // TODO save theme on user mobile
+
+        await Preferences.set({
+            key: "theme",
+            value: "dark",
+        });
     }
 
-    initTheme() {
-        //TODO retrieve theme from mobile save
-        let theme = undefined;
+    async initTheme() {
+        let theme = (await Preferences.get({ key: "theme" })).value as ThemeEnum;
         if (!this.isValidTheme(theme)) {
             theme = ThemeEnum.LIGHT;
         }
